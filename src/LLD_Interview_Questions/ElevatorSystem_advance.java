@@ -43,27 +43,27 @@ public class AsyncElevatorSystemDemo {
 
     static class Elevator implements Runnable {
 
-        private int id;
-        private volatile int currentFloor = 0;
-        private volatile Direction direction = Direction.IDLE;
-        private volatile ElevatorState state = ElevatorState.IDLE;
+            private int id;
+            private volatile int currentFloor = 0;
+            private volatile Direction direction = Direction.IDLE;
+            private volatile ElevatorState state = ElevatorState.IDLE;
 
-        private final TreeSet<Integer> upStops = new TreeSet<>();
-        private final TreeSet<Integer> downStops =
-                new TreeSet<>(Collections.reverseOrder());
+            private final TreeSet<Integer> upStops = new TreeSet<>();
+            private final TreeSet<Integer> downStops =
+                    new TreeSet<>(Collections.reverseOrder());
 
-        private final Object lock = new Object();
+            private final Object lock = new Object();
 
         public Elevator(int id) {
-            this.id = id;
-        }
+                this.id = id;
+            }
 
-        public int getId() {
-            return id;
-        }
+            public int getId() {
+                return id;
+            }
 
-        public int getCurrentFloor() {
-            return currentFloor;
+            public int getCurrentFloor() {
+                return currentFloor;
         }
 
         /* Add stop safely */

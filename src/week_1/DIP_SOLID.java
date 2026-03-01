@@ -45,7 +45,7 @@ public class DIP_SOLID {
 
         // Using Card payment
         Payment cardPayment = new CardPayment();
-        PaymentProcessor processor1 = new PaymentProcessor(cardPayment);
+        PaymentProcessor processor1 = new PaymentProcessor(new CardPayment());
         processor1.process(500);
 
         // Using UPI payment
