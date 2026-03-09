@@ -3,8 +3,8 @@
 //  Vending machine
 //. Load Balancer
 //Description:
-vehicle enters, system finds available spot, ticket generated, vehicle Parks 
-on exit -> calcluate price --> free spot
+// vehicle enters, system finds available spot, ticket generated, vehicle parks
+// on exit -> calculate price --> free spot
 
 
 // Functional Requirements:
@@ -96,38 +96,35 @@ class ParkingSpot {
 
 class ParkingFloor {
     private int floorNumber;
-    private List<ParkingSpot> spots;
+    private java.util.List<ParkingSpot> spots;
 
-    public ParkingFloor(int floorNumber, List<ParkingSpot> spots) {
+    public ParkingFloor(int floorNumber, java.util.List<ParkingSpot> spots) {
         this.floorNumber = floorNumber;
         this.spots = spots;
     }
 
-    public Optional<ParkingSpot> getAvailableSpot(Vehicle vehicle) {
+    public java.util.Optional<ParkingSpot> getAvailableSpot(Vehicle vehicle) {
         for (ParkingSpot spot : spots) {
             if (spot.canFitVehicle(vehicle)) {
-                return Optional.of(spot);
+                return java.util.Optional.of(spot);
             }
         }
         return Optional.empty();
     }
 }
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 class Ticket {
     private String ticketId;
     private Vehicle vehicle;
     private ParkingSpot spot;
-    private LocalDateTime entryTime;
-    private LocalDateTime exitTime;
+    private java.time.LocalDateTime entryTime;
+    private java.time.LocalDateTime exitTime;
 
     public Ticket(Vehicle vehicle, ParkingSpot spot) {
-        this.ticketId = UUID.randomUUID().toString();
+        this.ticketId = java.util.UUID.randomUUID().toString();
         this.vehicle = vehicle;
         this.spot = spot;
-        this.entryTime = LocalDateTime.now();
+        this.entryTime = java.time.LocalDateTime.now();
     }
 
     public void closeTicket() {
@@ -160,22 +157,20 @@ class HourlyPricingStrategy implements PricingStrategy {
     }
 }
 
-import java.util.*;
-
 class ParkingLot {
 
-    private List<ParkingFloor> floors;
+    private java.util.List<ParkingFloor> floors;
     private PricingStrategy pricingStrategy;
-    private Map<String, Ticket> activeTickets = new HashMap<>();
+    private java.util.Map<String, Ticket> activeTickets = new java.util.HashMap<>();
 
-    public ParkingLot(List<ParkingFloor> floors, PricingStrategy strategy) {
+    public ParkingLot(java.util.List<ParkingFloor> floors, PricingStrategy strategy) {
         this.floors = floors;
         this.pricingStrategy = strategy;
     }
 
     public Ticket parkVehicle(Vehicle vehicle) {
         for (ParkingFloor floor : floors) {
-            Optional<ParkingSpot> spotOpt = floor.getAvailableSpot(vehicle);
+            java.util.Optional<ParkingSpot> spotOpt = floor.getAvailableSpot(vehicle);
             if (spotOpt.isPresent()) {
                 ParkingSpot spot = spotOpt.get();
                 spot.parkVehicle(vehicle);
@@ -195,6 +190,33 @@ class ParkingLot {
         return pricingStrategy.calculatePrice(hours);
     }
 }
+
+public class ParkingLotBasicDemo {
+
+    public static void main(String[] args) {
+
+        java.util.List<ParkingSpot> spots = java.util.Arrays.asList(
+                new ParkingSpot(1, SpotType.CAR),
+                new ParkingSpot(2, SpotType.CAR),
+                new ParkingSpot(3, SpotType.BIKE)
+        );
+
+        ParkingFloor floor = new ParkingFloor(1, spots);
+        ParkingLot lot = new ParkingLot(
+                java.util.Arrays.asList(floor),
+                new HourlyPricingStrategy(20.0)
+        );
+
+        Vehicle vehicle = new Vehicle("KA01AB1234", VehicleType.CAR);
+
+        Ticket ticket = lot.parkVehicle(vehicle);
+        System.out.println("Vehicle parked. Ticket created.");
+
+        double amount = lot.unparkVehicle(ticket.toString());
+        System.out.println("Amount to be paid: " + amount);
+    }
+}
+
 
 
 

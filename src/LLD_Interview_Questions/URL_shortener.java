@@ -41,15 +41,19 @@ public class URL_Shortner {
 * */
 
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
 class UrlShortenerService {
 
     private static final String DOMAIN = "http://short.ly/";
 
-    private UrlRepository repository;
-    private Base62Encoder encoder;
-    private IdGenerator idGenerator;
+    private final UrlRepository repository;
+    private final Base62Encoder encoder;
+    private final IdGenerator idGenerator;
     
-    public UrlShortnerService() {
+    public UrlShortenerService() {
         this.repository  = new UrlRepository();
         this.encoder     = new Base62Encoder();
         this.idGenerator = new IdGenerator();
@@ -99,10 +103,10 @@ class UrlShortenerService {
 class UrlRepository{
     
     //shortURL --> Mapping
-    private Map<String, UrlMapping> shortToLong = new HashMap<>();
+    private final Map<String, UrlMapping> shortToLong = new HashMap<>();
 
     // id --> Mapping
-    private Map<Long, UrlMapping> idMap = new HashMap<>();
+    private final Map<Long, UrlMapping> idMap = new HashMap<>();
 
     public synchronized void save(UrlMapping mapping){
         shortToLong.put(mapping.getShortUrl(), mapping);
@@ -110,7 +114,7 @@ class UrlRepository{
 
     }
     public synchronized UrlMapping findByShortUrl(String shortUrl) {
-        shortToLong.get(shortUrl);
+        return shortToLong.get(shortUrl);
     }
 }
 
@@ -153,7 +157,7 @@ class UrlMapping {
 
 //ID Generator
 class IdGenerator {
-    private AtomicLong counter = new AtomicLong(100000);
+    private final AtomicLong counter = new AtomicLong(100000);
     public long generateId() {
         return counter.incrementAndGet();
     }

@@ -221,7 +221,7 @@ class NotificationService {
 
 /* ========================== MAIN ========================== */
 
-public class NotificationSystem_advanced {
+public class NotificationSystem_advance {
 
     public static void main(String[] args) throws InterruptedException {
 

@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AdvancedParkingLotSystem {
+public class ParkingLot_Advance {
 
     /* ================= ENUMS ================= */
 

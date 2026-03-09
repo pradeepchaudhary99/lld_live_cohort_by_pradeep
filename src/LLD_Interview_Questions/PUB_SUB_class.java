@@ -1,10 +1,11 @@
+/*
 DESIGN PUB-SUB:
 
 functional Req:
 	1  create topic
 	2. subscribe to a topic
 	3. unsubscribe from a topic
-	4. publish message 
+	4. publish message
 	5. deliver message to subscribers
 	multiple publishers
 
@@ -46,14 +47,13 @@ Subscribers
 
 
 Publisher ----< Message , Topic >------> MessageBroker ---- Subscribers
+*/
 
+public class PUB_SUB_class {
 
-
-
-
-
-
-
-
+    public static void main(String[] args) {
+        System.out.println("PUB_SUB_class design notes. See PubSubSystem.java for full implementation.");
+    }
+}
 
 

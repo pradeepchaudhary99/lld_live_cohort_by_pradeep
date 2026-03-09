@@ -1,6 +1,8 @@
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+// Simple movie ticket booking system with seat locking and payment
+
 enum SeatStatus {
     AVAILABLE,
     LOCKED,
@@ -8,7 +10,8 @@ enum SeatStatus {
 }
 
 class Seat {
-    private String seatId;
+    private final String seatId;
+    private SeatStatus status = SeatStatus.AVAILABLE;
 
     public Seat(String seatId) {
         this.seatId = seatId;
@@ -17,11 +20,19 @@ class Seat {
     public String getSeatId() {
         return seatId;
     }
+
+    public SeatStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SeatStatus status) {
+        this.status = status;
+    }
 }
 
 class Screen {
-    private String screenId;
-    private List<Seat> seats;
+    private final String screenId;
+    private final List<Seat> seats;
 
     public Screen(String screenId, List<Seat> seats) {
         this.screenId = screenId;
@@ -34,8 +45,8 @@ class Screen {
 }
 
 class Movie {
-    private String movieId;
-    private String title;
+    private final String movieId;
+    private final String title;
 
     public Movie(String movieId, String title) {
         this.movieId = movieId;
@@ -44,10 +55,9 @@ class Movie {
 }
 
 class Show {
-    private String showId;
-    private Movie movie;
-    private Screen screen;
-    private TimeStamp timestamp;
+    private final String showId;
+    private final Movie movie;
+    private final Screen screen;
 
     public Show(String showId, Movie movie, Screen screen) {
         this.showId = showId;
@@ -65,7 +75,7 @@ class Show {
 }
 
 class User {
-    private String userId;
+    private final String userId;
 
     public User(String userId) {
         this.userId = userId;
@@ -77,11 +87,10 @@ class User {
 }
 
 class Booking {
-    private String bookingId;
-    private User user;
-    private Show show;
-    private List<String> seatIds;
-                        paymentId;
+    private final String bookingId;
+    private final User user;
+    private final Show show;
+    private final List<String> seatIds;
 
     public Booking(String bookingId, User user, Show show, List<String> seatIds) {
         this.bookingId = bookingId;
@@ -93,10 +102,10 @@ class Booking {
 
 class SeatLock {
 
-    private String seatId;
-    private String showId;
-    private User user;
-    private long lockTime;
+    private final String seatId;
+    private final String showId;
+    private final User user;
+    private final long lockTime;
 
     public SeatLock(String seatId, String showId, User user) {
         this.seatId = seatId;
@@ -120,7 +129,7 @@ interface ShowRepository {
 
 class InMemoryShowRepository implements ShowRepository {
 
-    private Map<String, Show> shows = new HashMap<>();
+    private final Map<String, Show> shows = new HashMap<>();
 
     public void addShow(Show show) {
         shows.put(show.getShowId(), show);
@@ -137,16 +146,16 @@ interface BookingRepository {
 
 class InMemoryBookingRepository implements BookingRepository {
 
-    private Map<String, Booking> bookings = new HashMap<>();
+    private final Map<String, Booking> bookings = new HashMap<>();
 
     public void save(Booking booking) {
         bookings.put(UUID.randomUUID().toString(), booking);
     }
 }
 
-class LockManager {
+class SeatLockManager {
 
-    private Map<String, SeatLock> lockedSeats = new ConcurrentHashMap<>();
+    private final Map<String, SeatLock> lockedSeats = new ConcurrentHashMap<>();
 
     private String getKey(String showId, String seatId) {
         return showId + "_" + seatId;
@@ -155,18 +164,14 @@ class LockManager {
     public synchronized boolean lockSeats(User user, String showId, List<String> seatIds) {
 
         for (String seatId : seatIds) {
-
             String key = getKey(showId, seatId);
-
             if (lockedSeats.containsKey(key)) {
                 return false;
             }
         }
 
         for (String seatId : seatIds) {
-
             String key = getKey(showId, seatId);
-
             lockedSeats.put(key, new SeatLock(seatId, showId, user));
         }
 
@@ -174,21 +179,15 @@ class LockManager {
     }
 
     public synchronized void unlockSeats(String showId, List<String> seatIds) {
-
         for (String seatId : seatIds) {
-
             String key = getKey(showId, seatId);
-
             lockedSeats.remove(key);
         }
     }
 
     public synchronized void confirmSeats(String showId, List<String> seatIds) {
-
         for (String seatId : seatIds) {
-
             String key = getKey(showId, seatId);
-
             lockedSeats.remove(key);
         }
     }
@@ -197,19 +196,18 @@ class LockManager {
 class PaymentService {
 
     public boolean processPayment(User user, double amount) {
-
-        System.out.println("Payment processed");
-
+        System.out.println("Payment processed for user " + user.getUserId()
+                + " amount: " + amount);
         return true;
     }
 }
 
 class BookingService {
 
-    private ShowRepository showRepository;
-    private BookingRepository bookingRepository;
-    private SeatLockManager lockManager;
-    private PaymentService paymentService;
+    private final ShowRepository showRepository;
+    private final BookingRepository bookingRepository;
+    private final SeatLockManager lockManager;
+    private final PaymentService paymentService;
 
     public BookingService(
             ShowRepository showRepository,
@@ -226,8 +224,11 @@ class BookingService {
     public boolean bookSeats(User user, String showId, List<String> seatIds) {
 
         Show show = showRepository.findById(showId);
+        if (show == null) {
+            System.out.println("Show not found");
+            return false;
+        }
 
-        //Lock the seat
         boolean locked = lockManager.lockSeats(user, showId, seatIds);
 
         if (!locked) {
@@ -235,14 +236,10 @@ class BookingService {
             return false;
         }
 
-        //Lock success --> ask for the payment
-
-        Payment paymentSuccess = paymentService.processPayment(user, 500);
+        boolean paymentSuccess = paymentService.processPayment(user, 500);
 
         if (!paymentSuccess) {
-
             lockManager.unlockSeats(showId, seatIds);
-
             return false;
         }
 
@@ -250,11 +247,10 @@ class BookingService {
                 UUID.randomUUID().toString(),
                 user,
                 show,
-                seatIds,
+                seatIds
         );
 
         bookingRepository.save(booking);
-
         lockManager.confirmSeats(showId, seatIds);
 
         System.out.println("Booking successful");
@@ -262,11 +258,7 @@ class BookingService {
         return true;
     }
 
-
-    //add other functionalities
-    // Search
-    // Recommendation
-    // BookMyShow
+    // add other functionalities: search, recommendation, etc.
 }
 
 public class MovieBookingSystem {
@@ -302,6 +294,7 @@ public class MovieBookingSystem {
         bookingService.bookSeats(user, "SHOW1", Arrays.asList("A1", "A2"));
     }
 }
+
 
 
 Entities

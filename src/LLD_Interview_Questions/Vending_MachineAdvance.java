@@ -236,7 +236,7 @@ class DispenseState implements State {
 }
 
 // MAIN
-public class VendingMachineDemo {
+public class Vending_MachineAdvance {
     public static void main(String[] args) {
 
         VendingMachine machine = new VendingMachine();

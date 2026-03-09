@@ -79,7 +79,7 @@ Elevator processes destination
     - Strategy based scheduling
 */
 
-public class ElevatorSystemDemo {
+public class ElevatorSystem_basics {
 
     /* ================= ENUMS ================= */
 

@@ -35,38 +35,28 @@ Non-Functional Requirements:
  - Extensible
  		- open for adding new appenders
 
-*/
 
 Core components:
-Logger
-LogLevel(enum)
-LogMessage
-Appender (interface)
-	- FileAppender
-	- ConsoleAppender
+	Logger
+	LogLevel(enum)
+	LogMessage
+	Appender (interface)
+		- FileAppender
+		- ConsoleAppender
+	Formatter (interface) – optional
 
-#Formatter (interface)
-
-client --> Logger --> Appenders 
+Client --> Logger --> Appenders 
 
 Strategy Pattern --> Appenders
-
 Singleton Pattern --> Logger
 
+Core design and relationships described above.
+*/
 
-Core Design and relationship:
-
-
-
-
-
-
-
-
-
-
-
-
-
+public class Logger_class_code {
+    public static void main(String[] args) {
+        System.out.println("Logger design notes. See LoggerSystemDemo.java or SimpleAsyncLoggerDemo.java for full implementation.");
+    }
+}
 
 
